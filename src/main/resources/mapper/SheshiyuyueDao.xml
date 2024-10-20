@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.SheshiyuyueDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.sheshiyuyue_uuid_number as sheshiyuyueUuidNumber
+        ,a.sheshiyuyue_name as sheshiyuyueName
+        ,a.sheshiyuyue_sheshi as sheshiyuyueSheshi
+        ,a.sheshiyuyue_types as sheshiyuyueTypes
+        ,a.yonghu_id as yonghuId
+        ,a.sheshiyuyue_text as sheshiyuyueText
+        ,a.insert_time as insertTime
+        ,a.sheshiyuyue_yesno_types as sheshiyuyueYesnoTypes
+        ,a.sheshiyuyue_yesno_text as sheshiyuyueYesnoText
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.SheshiyuyueView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+        ,yonghu.data_delete as dataDelete
+
+        FROM sheshiyuyue  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.sheshiyuyueUuidNumber != '' and params.sheshiyuyueUuidNumber != null and params.sheshiyuyueUuidNumber != 'null' ">
+                and a.sheshiyuyue_uuid_number like CONCAT('%',#{params.sheshiyuyueUuidNumber},'%')
+            </if>
+            <if test=" params.sheshiyuyueName != '' and params.sheshiyuyueName != null and params.sheshiyuyueName != 'null' ">
+                and a.sheshiyuyue_name like CONCAT('%',#{params.sheshiyuyueName},'%')
+            </if>
+            <if test=" params.sheshiyuyueSheshi != '' and params.sheshiyuyueSheshi != null and params.sheshiyuyueSheshi != 'null' ">
+                and a.sheshiyuyue_sheshi like CONCAT('%',#{params.sheshiyuyueSheshi},'%')
+            </if>
+            <if test="params.sheshiyuyueTypes != null and params.sheshiyuyueTypes != ''">
+                and a.sheshiyuyue_types = #{params.sheshiyuyueTypes}
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.sheshiyuyueText != '' and params.sheshiyuyueText != null and params.sheshiyuyueText != 'null' ">
+                and a.sheshiyuyue_text like CONCAT('%',#{params.sheshiyuyueText},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+            <if test="params.sheshiyuyueYesnoTypes != null and params.sheshiyuyueYesnoTypes != ''">
+                and a.sheshiyuyue_yesno_types = #{params.sheshiyuyueYesnoTypes}
+            </if>
+            <if test=" params.sheshiyuyueYesnoText != '' and params.sheshiyuyueYesnoText != null and params.sheshiyuyueYesnoText != 'null' ">
+                and a.sheshiyuyue_yesno_text like CONCAT('%',#{params.sheshiyuyueYesnoText},'%')
+            </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.newMoney != null and params.newMoney != ''">
+                and a.new_money = #{params.newMoney}
+            </if>
+            <if test="params.dataDeleteStart != null  and params.dataDeleteStart != '' ">
+                <![CDATA[  and yonghu.data_delete >= #{params.dataDeleteStart}   ]]>
+            </if>
+            <if test="params.dataDeleteEnd != null  and params.dataDeleteEnd != '' ">
+                <![CDATA[  and yonghu.data_delete <= #{params.dataDeleteEnd}   ]]>
+            </if>
+            <if test="params.dataDelete != null  and params.dataDelete != '' ">
+                and yonghu.data_delete = #{params.dataDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(yonghu.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
